@@ -50,7 +50,7 @@ async def alterar_produto(inputDto: AlterarProdutoDto):
 
 @router.post("/alterar_pedido", status_code=204)
 async def alterar_pedido(inputDto: AlterarPedidoDto):
-    if PedidoRepo.alterar_estado(inputDto.id, inputDto.estado.value): return None
+    if PedidoRepo.alterar_estado(inputDto.id, inputDto.estado): return None
     pd = ProblemDetailsDto("int", f"O pedido com id <b>{inputDto.id}</b> não foi encontrado.", "value_not_found", ["body", "id"])
     return JSONResponse(pd.to_dict(), status_code=404)
 

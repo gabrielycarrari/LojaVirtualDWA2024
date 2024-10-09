@@ -30,15 +30,13 @@ templates = obter_jinja_templates("templates/cliente")
 async def get_pedidos(request: Request, periodo: str = Query("todos")):
     data_inicial = datetime(1900, 1, 1)
     data_final = datetime.now()
-
     match periodo:
         case "30":
-            data_inicial = datetime.now() - timedelta(days=30)
+            data_inicial = data_final - timedelta(days=30)
         case "60":
-            data_inicial = datetime.now() - timedelta(days=60)
+            data_inicial = data_final - timedelta(days=60)
         case "90":
-            data_inicial = datetime.now() - timedelta(days=90)
-
+            data_inicial = data_final - timedelta(days=90)
     pedidos = PedidoRepo.obter_por_periodo(request.state.usuario.id, data_inicial, data_final)
     return templates.TemplateResponse(
         "pages/pedidos.html",
@@ -116,7 +114,7 @@ async def get_carrinho(request: Request):
         response = RedirectResponse("/", status.HTTP_303_SEE_OTHER)
         adicionar_mensagem_alerta(
             response,
-            "Seu carrinho está vazio. Adicione produtos para continuar"
+            "Seu carrinho está vazio. Adicione produtos para continuar."
         )
         return response
     total_pedido = sum([item.valor_item for item in itens_pedido])
@@ -202,7 +200,7 @@ async def get_pagamento(request: Request, id_pedido: int = Path(...)):
         "payer": {
             "name": "Test",
             "surname": "Test",
-            "email": "test_user_156801601@testuser.com",
+            "email": "test_user_1218031040@testuser.com",
         },
         "back_urls": {
             "success": f"{url_de_retorno_do_mp}/cliente/mp/sucesso/{pedido.id}",
@@ -251,7 +249,7 @@ async def get_mp_pendente(
 ):
     pedido = PedidoRepo.obter_por_id(id_pedido)
     PedidoRepo.alterar_estado(id_pedido, EstadoPedido.PAGO.value)
-    return RedirectResponse(f"/cliente/detalhes/{id_pedido}")
+    return RedirectResponse(f"/cliente/detalhespedido/{id_pedido}")
 
 
 @router.post("/post_adicionar_carrinho", response_class=RedirectResponse)
@@ -349,13 +347,15 @@ async def post_reduzir_item(request: Request, id_produto: int = Form(0)):
         response,
         f"O produto <b>{produto.nome}</b> teve sua quantidade diminuída para <b>{qtde-1}</b>.",
     )
+    PedidoRepo.atualizar_valor_total(pedido_carrinho.id)
     return response
+
 
 @router.post("/post_remover_item", response_class=RedirectResponse)
 async def post_remover_item(request: Request, id_produto: int = Form(0)):
     if not id_produto:
         return RedirectResponse("/cliente/carrinho", status.HTTP_304_NOT_MODIFIED)
-    produto = ProdutoRepo.obter_um(id_produto) 
+    produto = ProdutoRepo.obter_um(id_produto)
     if not produto:
         response = RedirectResponse("/cliente/carrinho", status.HTTP_304_NOT_MODIFIED)
         adicionar_mensagem_alerta(response, "Produto não encontrado.")
@@ -402,7 +402,7 @@ async def get_detalhespedido(
     id_pedido: int = Path(...),
 ):
     pedido = PedidoRepo.obter_por_id(id_pedido)
-    if not pedido or pedido.id_cliente != request.state.usuario.id:
+    if pedido.id_cliente != request.state.usuario.id:
         response = RedirectResponse(url="/pedidos", status_code=status.HTTP_302_FOUND)
         return adicionar_mensagem_erro(
             response,
@@ -417,15 +417,15 @@ async def get_detalhespedido(
 
 
 @router.post("/post_cancelar_pedido", response_class=RedirectResponse)
-async def post_cancelar_pedido( request: Request, id_pedido: int = Form(0)):
+async def post_cancelar_pedido(request: Request, id_pedido: int = Form(0)):
     pedido = PedidoRepo.obter_por_id(id_pedido)
-    if pedido.id_cliente != request.state.usuario.id:
+    if not pedido or pedido.id_cliente != request.state.usuario.id:
         response = RedirectResponse(url="/cliente/pedidos", status_code=status.HTTP_302_FOUND)
-        adicionar_mensagem_erro(response, "Pedido não encontrado. Verifique o número do pedido e tente novamente.")	
-        return response
-        
+        return adicionar_mensagem_erro(
+            response,
+            "Pedido não encontrado. Verifique o número do pedido e tente novamente.",
+        )
     PedidoRepo.alterar_estado(id_pedido, EstadoPedido.CANCELADO.value)
     response = RedirectResponse(url="/cliente/pedidos", status_code=status.HTTP_303_SEE_OTHER)
     adicionar_mensagem_sucesso(response, "Pedido cancelado com sucesso.")
     return response
-   

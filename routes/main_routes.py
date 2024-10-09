@@ -1,9 +1,8 @@
 import math
-from sqlite3 import DatabaseError
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from dtos.entrar_dto import EntrarDTO
+from dtos.entrar_dto import EntrarDto
 from util.html import ler_html
 from dtos.inserir_usuario_dto import InserirUsuarioDTO
 from models.usuario_model import Usuario
@@ -18,6 +17,7 @@ from util.auth_jwt import (
 from util.cookies import TEMPO_COOKIE_AUTH, adicionar_cookie_auth, adicionar_mensagem_sucesso
 from util.pydantic import create_validation_errors
 from util.templates import obter_jinja_templates
+
 
 router = APIRouter(include_in_schema=False)
 templates = obter_jinja_templates("templates/main")
@@ -90,7 +90,7 @@ async def get_entrar(
 
 
 @router.post("/post_entrar", response_class=JSONResponse)
-async def post_entrar(entrar_dto: EntrarDTO):
+async def post_entrar(entrar_dto: EntrarDto):
     cliente_entrou = UsuarioRepo.obter_por_email(entrar_dto.email)
     if (
         (not cliente_entrou)

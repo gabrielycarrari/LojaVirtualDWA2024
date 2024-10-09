@@ -1,12 +1,11 @@
 from pydantic import BaseModel, field_validator
-from datetime import date, datetime, timedelta
 
 from util.validators import *
 
 
-class InserirProdutoDTO(BaseModel):
+class InserirProdutoDto(BaseModel):
     nome: str
-    preco: float
+    preco: float    
     descricao: str
     estoque: int
 

@@ -16,7 +16,6 @@ UsuarioRepo.inserir_usuarios_json("sql/usuarios.json")
 PedidoRepo.criar_tabela()
 ItemPedidoRepo.criar_tabela()
 app = FastAPI(dependencies=[Depends(checar_autorizacao)])
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,9 +23,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 app.mount(path="/static", app=StaticFiles(directory="static"), name="static")
-app.middleware(middleware_type="http")(checar_autenticacao)
+app.middleware("http")(checar_autenticacao)
 configurar_excecoes(app)
 app.include_router(main_routes.router)
 app.include_router(cliente_routes.router)

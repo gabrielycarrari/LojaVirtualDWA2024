@@ -90,13 +90,13 @@ class PedidoRepo:
         except sqlite3.Error as ex:
             print(ex)
             return False
-
+        
     @classmethod
     def atualizar_valor_total(
-        cls, id: int, valor_total: float = 0.0
+        cls, id: int, valor_total: float = 0
     ) -> bool:
         if not valor_total:
-            itens  = ItemPedidoRepo.obter_por_pedido(id)
+            itens = ItemPedidoRepo.obter_por_pedido(id)
             if itens:
                 valor_total = sum([item.valor_item for item in itens])
         try:
@@ -113,7 +113,7 @@ class PedidoRepo:
         except sqlite3.Error as ex:
             print(ex)
             return False
-        
+
     @classmethod
     def excluir(cls, id: int) -> bool:
         try:
@@ -207,7 +207,7 @@ class PedidoRepo:
         except sqlite3.Error as ex:
             print(ex)
             return None
-
+        
     @classmethod
     def obter_todos_por_estado(cls, estado: int) -> List[Pedido]:
         try:

@@ -38,7 +38,6 @@ SQL_ATUALIZAR_VALOR_TOTAL = """
     WHERE id=?
 """
 
-
 SQL_EXCLUIR = """
     DELETE FROM pedido
     WHERE id=?
@@ -80,4 +79,3 @@ SQL_OBTER_TODOS_POR_ESTADO = """
     FROM pedido
     WHERE (estado = ?)
 """
-

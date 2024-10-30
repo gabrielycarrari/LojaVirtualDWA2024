@@ -87,6 +87,7 @@ async def evoluir_pedido(id_pedido: int = Path(..., title="Id do Pedido", ge=1))
 @router.get("/obter_pedido/{id_pedido}")
 async def obter_pedido(id_pedido: int = Path(..., title="Id do Pedido", ge=1)):
     # TODO: refatorar criando Dto com resultado específico
+    await asyncio.sleep(1)
     pedido = PedidoRepo.obter_por_id(id_pedido)
     if pedido: 
         itens = ItemPedidoRepo.obter_por_pedido(pedido.id)
@@ -106,7 +107,7 @@ async def obter_pedidos_por_estado(estado: EstadoPedido = Path(..., title="Estad
 @router.get("/obter_usuarios")
 async def obter_usuarios() -> list[Usuario]:
     # Delay de 2 segundos
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
     usuarios = UsuarioRepo.obter_todos()
     return usuarios
 

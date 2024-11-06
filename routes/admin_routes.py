@@ -59,15 +59,15 @@ async def alterar_pedido(inputDto: AlterarPedidoDto):
     pd = ProblemDetailsDto("int", f"O pedido com id <b>{inputDto.id}</b> não foi encontrado.", "value_not_found", ["body", "id"])
     return JSONResponse(pd.to_dict(), status_code=404)
 
-@router.post("/cancelar_pedido/{id_pedido}", status_code=204)
-async def cancelar_pedido(id_pedido: int = Path(..., title="Id do Pedido", ge=1)):
+@router.post("/cancelar_pedido", status_code=204)
+async def cancelar_pedido(id_pedido: int = Form(..., title="Id do Pedido", ge=1)):
     if PedidoRepo.alterar_estado(id_pedido, EstadoPedido.CANCELADO.value): 
         return None
     pd = ProblemDetailsDto("int", f"O pedido com id <b>{id_pedido}</b> não foi encontrado.", "value_not_found", ["body", "id"])
     return JSONResponse(pd.to_dict(), status_code=404)
 
-@router.post("/evoluir_pedido/{id_pedido}", status_code=204)
-async def evoluir_pedido(id_pedido: int = Path(..., title="Id do Pedido", ge=1)):
+@router.post("/evoluir_pedido", status_code=204)
+async def evoluir_pedido(id_pedido: int = Form(..., title="Id do Pedido", ge=1)):
     pedido = PedidoRepo.obter_por_id(id_pedido)
     if not pedido:
         pd = ProblemDetailsDto("int", f"O pedido com id <b>{id_pedido}</b> não foi encontrado.", "value_not_found", ["body", "id"])

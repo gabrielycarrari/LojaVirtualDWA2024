@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Form, Path
 from fastapi.responses import JSONResponse
 
 from dtos.alterar_pedido_dto import AlterarPedidoDto
@@ -33,9 +33,9 @@ async def inserir_produto(inputDto: InserirProdutoDto) -> Produto:
     return novo_produto
 
 @router.post("/excluir_produto", status_code=204)
-async def excluir_produto(inputDto: IdProdutoDto):
-    if ProdutoRepo.excluir(inputDto.id_produto): return None
-    pd = ProblemDetailsDto("int", f"O produto com id <b>{inputDto.id_produto}</b> não foi encontrado.", "value_not_found", ["body", "id_produto"])
+async def excluir_produto(id_produto:  int = Form(...)):
+    if ProdutoRepo.excluir(id_produto): return None
+    pd = ProblemDetailsDto("int", f"O produto com id <b>{id_produto}</b> não foi encontrado.", "value_not_found", ["body", "id_produto"])
     return JSONResponse(pd.to_dict(), staatus_code=404)
 
 @router.get("/obter_produto/{id_produto}")
@@ -111,18 +111,8 @@ async def obter_usuarios() -> list[Usuario]:
     usuarios = UsuarioRepo.obter_todos()
     return usuarios
 
-# @router.get("/excluir_usuario/{id_usuario}", status_code=204)
-# async def excluir_usuario(id_usuario: int = Path(..., title="Id do Usuário", ge=1)):
-#     if UsuarioRepo.excluir(id_usuario):
-#         return None
-    
-#     pd = ProblemDetailsDto(input="int", msg=f"O usuário com id {id_usuario} não foi encontrado", type="value_not_found", loc=["body", "id"])
-
-#     return JSONResponse(pd.to_dict(), status_code=404)
-
-
 @router.post("/excluir_usuario", status_code=204)
-async def excluir_usuario(inputDto: IdUsuarioDto):
-    if UsuarioRepo.excluir(inputDto.id_usuario): return None
-    pd = ProblemDetailsDto("int", f"O usuário com id <b>{inputDto.id_usuario}</b> não foi encontrado.", "value_not_found", ["body", "id_produto"])
+async def excluir_usuario(id_usuario: int = Form(...)):
+    if UsuarioRepo.excluir(id_usuario): return None
+    pd = ProblemDetailsDto("int", f"O usuário com id <b>{id_usuario}</b> não foi encontrado.", "value_not_found", ["body", "id_produto"])
     return JSONResponse(pd.to_dict(), staatus_code=404)
